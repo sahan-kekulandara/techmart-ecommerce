@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence
+        xmlns="https://jakarta.ee/xml/ns/persistence"
+        version="3.0">
+
+    <persistence-unit
+            name="TechMartPU"
+            transaction-type="JTA">
+
+        <jta-data-source>
+            jdbc/TechMartDS
+        </jta-data-source>
+
+        <class>com.techmart.core.entity.User</class>
+        <class>com.techmart.core.entity.UserStatus</class>
+
+        <properties>
+
+            <property
+                    name="jakarta.persistence.schema-generation.database.action"
+                    value="create"/>
+
+            <property
+                    name="eclipselink.logging.level"
+                    value="FINE"/>
+        </properties>
+
+    </persistence-unit>
+
+</persistence>
