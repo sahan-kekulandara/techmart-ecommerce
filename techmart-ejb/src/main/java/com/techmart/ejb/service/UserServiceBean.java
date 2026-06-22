@@ -6,6 +6,7 @@ import com.techmart.core.dto.UserDTO;
 import com.techmart.core.entity.User;
 import com.techmart.core.entity.UserStatus;
 import com.techmart.core.enums.UserStatusType;
+import com.techmart.core.mapper.UserMapper;
 import com.techmart.core.util.SecurityUtil;
 import com.techmart.core.util.ValidationUtil;
 import com.techmart.ejb.repository.UserRepository;
@@ -33,44 +34,61 @@ public class UserServiceBean implements UserService {
 
         if (userDTO.getFirstName() == null || userDTO.getFirstName().isBlank()) {
             throw new RuntimeException("Please enter your First Name");
-        } else if (userDTO.getLastName() == null || userDTO.getLastName().isBlank()) {
+        }
+
+        if (userDTO.getLastName() == null || userDTO.getLastName().isBlank()) {
             throw new RuntimeException("Please enter your Last Name");
-        } else if (userDTO.getEmail() == null || userDTO.getEmail().isBlank()) {
+        }
+
+        if (userDTO.getEmail() == null || userDTO.getEmail().isBlank()) {
             throw new RuntimeException("Please enter your Email");
-        } else if (!ValidationUtil.isValidEmail(userDTO.getEmail())) {
+        }
+
+        if (!ValidationUtil.isValidEmail(userDTO.getEmail())) {
             throw new RuntimeException("Invalid email.");
-        } else if (repository.existsByEmail(userDTO.getEmail())) {
-            throw new RuntimeException("Email already exists");
-        } else if (userDTO.getPassword() == null || userDTO.getPassword().isBlank()) {
+        }
+
+        User testUser = repository.findByEmail(userDTO.getEmail());
+        if (testUser != null) {
+            if (UserStatusType.INACTIVE.getId().equals(testUser.getUserStatus().getId())) {
+                throw new IllegalStateException("Your account is suspended");
+            }
+            throw new IllegalStateException("Email already exists");
+        }
+
+        if (userDTO.getPassword() == null || userDTO.getPassword().isBlank()) {
             throw new RuntimeException("Please enter your Password");
-        } else if (!ValidationUtil.isValidPassword(userDTO.getPassword())) {
+        }
+
+        if (!ValidationUtil.isValidPassword(userDTO.getPassword())) {
             throw new RuntimeException(
                     "Password must contain at least " +
                             "8 characters, one uppercase letter, " +
                             "one lowercase letter and one number.");
-        } else {
-            User user = new User();
-            user.setFirstName(userDTO.getFirstName());
-            user.setLastName(userDTO.getLastName());
-            user.setEmail(userDTO.getEmail());
-            user.setPassword(userDTO.getPassword());
-
-            String token = SecurityUtil.generateVerificationToken();
-            user.setVerificationToken(token);
-
-            user.setCreatedAt(Timestamp.from(Instant.now()));
-
-            UserStatus status = statusRepository.findStatusById(UserStatusType.UNVERIFIED.getId());
-            user.setUserStatus(status);
-
-            String link =
-                    "http://localhost:8080/techmart/verify?token="
-                            + token;
-
-            emailService.sendVerificationEmail(user.getEmail(), link);
-            repository.save(user);
         }
+
+        User user = new User();
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setEmail(userDTO.getEmail());
+        user.setPassword(userDTO.getPassword());
+
+        String token = SecurityUtil.generateVerificationToken();
+        user.setVerificationToken(token);
+
+        user.setCreatedAt(Timestamp.from(Instant.now()));
+
+        UserStatus status = statusRepository.findStatusById(UserStatusType.UNVERIFIED.getId());
+        user.setUserStatus(status);
+
+        String link =
+                "http://localhost:8080/techmart/verify?token="
+                        + token;
+
+        emailService.sendVerificationEmail(user.getEmail(), link);
+        repository.save(user);
     }
+
 
     @Override
     public void userVerify(String token) {
@@ -88,4 +106,35 @@ public class UserServiceBean implements UserService {
         repository.update(user);
     }
 
+    @Override
+    public UserDTO login(String email, String password) {
+
+        if (email == null || email.isBlank()) {
+            throw new RuntimeException("Please enter your email.");
+        }
+
+        if (password == null || password.isBlank()) {
+            throw new RuntimeException("Please enter your password.");
+        }
+
+        User user = repository.findByEmail(email);
+
+        if (user == null) {
+            throw new RuntimeException("Invalid email or password.");
+        }
+
+        if (user.getUserStatus().getId().equals(UserStatusType.UNVERIFIED.getId())) {
+            throw new RuntimeException("Please verify your account first ! signup again.");
+        }
+
+        if (user.getUserStatus().getId().equals(UserStatusType.INACTIVE.getId())) {
+            throw new RuntimeException("Your account is blocked.");
+        }
+
+        if (!user.getPassword().equals(password)) {
+            throw new RuntimeException("Invalid email or password.");
+        }
+
+        return UserMapper.toDTO(user);
+    }
 }

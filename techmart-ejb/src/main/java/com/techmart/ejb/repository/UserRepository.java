@@ -34,7 +34,7 @@ public class UserRepository {
                             "SELECT u FROM User u " +
                                     "WHERE u.verificationToken = :token AND u.userStatus.status = :status",
                             User.class)
-                    .setParameter("token", token).setParameter("status","unverified")
+                    .setParameter("token", token).setParameter("status", "unverified")
                     .getSingleResult();
 
         } catch (NoResultException e) {
@@ -52,5 +52,15 @@ public class UserRepository {
 
     public void delete(User user) {
         em.remove(em.contains(user) ? user : em.merge(user));
+    }
+
+    public User findByEmail(String email) {
+
+        try {
+            return em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class).setParameter("email", email).getSingleResult();
+        } catch (
+                NoResultException e) {
+            return null;
+        }
     }
 }

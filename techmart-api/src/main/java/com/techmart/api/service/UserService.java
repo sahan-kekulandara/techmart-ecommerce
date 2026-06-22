@@ -4,6 +4,7 @@ import com.techmart.core.dto.UserDTO;
 import com.techmart.core.entity.User;
 
 public interface UserService {
-    public void register(UserDTO user);
-    public void userVerify(String token);
+    void register(UserDTO user);
+    void userVerify(String token);
+    UserDTO login(String email,String password);
 }

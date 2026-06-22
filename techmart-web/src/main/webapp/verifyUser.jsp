@@ -50,7 +50,7 @@
 
         <div class="col-12 col-lg-5 col-xl-5 pe-lg-4 pe-xl-5 text-center text-lg-start d-none d-lg-block">
             <div class="mb-4">
-                <img src="icon.png" alt="TechMart Brand Icon" class="mb-3" style="height: 60px; width: auto; object-fit: contain;"/>
+                <img src="images/logo/icon.png" alt="TechMart Brand Icon" class="mb-3" style="height: 60px; width: auto; object-fit: contain;"/>
                 <h1 class="display-5 fw-extrabold text-dark tracking-tight">Securing Your Tech Procurement</h1>
                 <p class="lead text-secondary">To protect your online catalog interactions and transaction pipelines, we have generated a seamless authentication route straight to your inbox.</p>
             </div>
