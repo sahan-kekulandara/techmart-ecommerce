@@ -22,6 +22,7 @@ public class UserDTO implements Serializable {
     private String lastName;
     private String email;
     private String password;
+    private String verificationToken;
     private Timestamp createdAt;
     private UserStatusDTO userStatus;
 }

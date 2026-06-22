@@ -31,6 +31,9 @@ public class User implements Serializable {
     @Column(length = 20, nullable = false)
     private String password;
 
+    @Column(name = "verification_token", length = 100)
+    private String verificationToken;
+
     @Column(name = "created_at", nullable = false)
     private Timestamp createdAt;
 

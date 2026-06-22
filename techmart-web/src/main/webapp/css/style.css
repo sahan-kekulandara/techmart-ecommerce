@@ -1,0 +1,115 @@
+/* ==========================================================================
+   TechMart Platform - Global Theme Architecture Stylesheet
+   ========================================================================== */
+
+/* 1. Global Variable Tokens */
+:root {
+    --tm-primary: #0d6efd;
+    --tm-primary-dark: #0a58ca;
+    --tm-secondary: #6c757d;
+    --tm-bg-workspace: #f4f6f9;
+    --tm-bg-card: #ffffff;
+    --tm-text-main: #212529;
+    --tm-text-muted: #6c757d;
+    --tm-border-color: #dee2e6;
+    --tm-radius: 0.75rem;
+    --tm-font-stack: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* 2. Base Element Resets */
+body {
+    background-color: var(--tm-bg-workspace);
+    color: var(--tm-text-main);
+    font-family: var(--tm-font-stack);
+    min-height: 100vh;
+    display: flex;
+    flex-column: column;
+}
+
+/* 3. Typography & Form Labels */
+.form-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--tm-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.4rem;
+}
+
+/* 4. Unified Form Controls */
+.input-group-text {
+    background-color: #f8f9fa;
+    color: var(--tm-text-muted);
+    border-color: var(--tm-border-color);
+}
+
+.form-control, .form-select {
+    background-color: #f8f9fa;
+    border-color: var(--tm-border-color);
+    padding: 0.6rem 0.75rem;
+    font-size: 0.95rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #ffffff;
+    border-color: var(--tm-primary);
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
+}
+
+/* 5. Custom Button Layouts */
+.btn-primary {
+    background: linear-gradient(135deg, var(--tm-primary) 0%, var(--tm-primary-dark) 100%);
+    border: none;
+    padding: 0.7rem 1.5rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* 6. Modular Component Structures */
+.tm-card {
+    background-color: var(--tm-bg-card);
+    border: none;
+    border-radius: var(--tm-radius);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.05);
+}
+
+.tm-brand-gradient {
+    background: linear-gradient(135deg, var(--tm-primary) 0%, var(--tm-primary-dark) 100%);
+    color: #ffffff;
+}
+
+/* 7. Shared Data Table Layouts */
+.tm-table {
+    background-color: var(--tm-bg-card);
+    border-radius: var(--tm-radius);
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.tm-table th {
+    background-color: #f8f9fa;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--tm-text-muted);
+    border-bottom: 2px solid var(--tm-border-color);
+    padding: 1rem;
+}
+
+.tm-table td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--tm-border-color);
+}
