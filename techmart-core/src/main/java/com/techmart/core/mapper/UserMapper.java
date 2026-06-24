@@ -1,32 +1,64 @@
 package com.techmart.core.mapper;
 
 import com.techmart.core.dto.UserDTO;
-import com.techmart.core.dto.UserStatusDTO;
 import com.techmart.core.entity.User;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
+@ApplicationScoped
 public class UserMapper {
 
-    private UserMapper() {
-    }
+    @Inject
+    private UserStatusMapper userStatusMapper;
 
-    public static UserDTO toDTO(User user) {
+    @Inject
+    private UserTypeMapper userTypeMapper;
 
-        if (user == null) {
+    public UserDTO toDTO(User entity) {
+        if (entity == null) {
             return null;
         }
 
         UserDTO dto = new UserDTO();
+        dto.setId(entity.getId());
+        dto.setFirstName(entity.getFirstName());
+        dto.setLastName(entity.getLastName());
+        dto.setEmail(entity.getEmail());
+        dto.setPassword(entity.getPassword());
+        dto.setCreatedAt(entity.getCreatedAt());
 
-        dto.setId(user.getId());
-        dto.setFirstName(user.getFirstName());
-        dto.setLastName(user.getLastName());
-        dto.setEmail(user.getEmail());
-        dto.setPassword(user.getPassword());
-        dto.setCreatedAt(user.getCreatedAt());
+        if (entity.getUserStatus() != null) {
+            dto.setUserStatus(userStatusMapper.toDTO(entity.getUserStatus()));
+        }
 
-        UserStatusDTO statusDTO = UserStatusMapper.toDTO(user.getUserStatus());
-        dto.setUserStatus(statusDTO);
+        if (entity.getUserType() != null) {
+            dto.setUserType(userTypeMapper.toDTO(entity.getUserType()));
+        }
 
         return dto;
+    }
+
+    public User toEntity(UserDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        User entity = new User();
+        entity.setId(dto.getId());
+        entity.setFirstName(dto.getFirstName());
+        entity.setLastName(dto.getLastName());
+        entity.setEmail(dto.getEmail());
+        entity.setPassword(dto.getPassword());
+        entity.setCreatedAt(dto.getCreatedAt());
+
+        if (dto.getUserStatus() != null) {
+            entity.setUserStatus(userStatusMapper.toEntity(dto.getUserStatus()));
+        }
+
+        if (dto.getUserType() != null) {
+            entity.setUserType(userTypeMapper.toEntity(dto.getUserType()));
+        }
+
+        return entity;
     }
 }

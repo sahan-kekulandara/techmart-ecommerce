@@ -13,9 +13,15 @@
 
         <class>com.techmart.core.entity.User</class>
         <class>com.techmart.core.entity.UserStatus</class>
+        <class>com.techmart.core.entity.UserType</class>
+        <class>com.techmart.core.entity.Product</class>
+        <class>com.techmart.core.entity.ProductStatus</class>
+        <class>com.techmart.core.entity.ProductImage</class>
+        <class>com.techmart.core.entity.Category</class>
+        <class>com.techmart.core.entity.Subcategory</class>
+
 
         <properties>
-
             <property
                     name="jakarta.persistence.schema-generation.database.action"
                     value="create"/>

@@ -1,6 +1,8 @@
 package com.techmart.core.dto;
 
-import com.techmart.core.entity.UserStatus;
+import com.techmart.core.entity.Category;
+import com.techmart.core.entity.ProductStatus;
+import com.techmart.core.entity.Subcategory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,16 +16,15 @@ import java.sql.Timestamp;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO implements Serializable {
+public class ProductDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String password;
-    private String verificationToken;
+    private String title;
+    private String description;
+    private Double price;
+    private int qty;
     private Timestamp createdAt;
-    private UserStatusDTO userStatus;
-    private UserTypeDTO userType;
+    private SubcategoryDTO subcategory;
+    private ProductStatusDTO productStatus;
 }

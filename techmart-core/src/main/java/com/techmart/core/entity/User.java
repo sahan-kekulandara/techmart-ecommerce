@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.time.Instant;
 
 @Entity
 @Table(name = "users")
@@ -37,7 +38,16 @@ public class User implements Serializable {
     @Column(name = "created_at", nullable = false)
     private Timestamp createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_status_id", nullable = false)
     private UserStatus userStatus;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_type_id", nullable = false)
+    private UserType userType;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = Timestamp.from(Instant.now());
+    }
 }

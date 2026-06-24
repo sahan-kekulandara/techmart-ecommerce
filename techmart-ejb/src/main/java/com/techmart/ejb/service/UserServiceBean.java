@@ -6,16 +6,16 @@ import com.techmart.core.dto.UserDTO;
 import com.techmart.core.entity.User;
 import com.techmart.core.entity.UserStatus;
 import com.techmart.core.enums.UserStatusType;
+import com.techmart.core.enums.UserType;
 import com.techmart.core.mapper.UserMapper;
 import com.techmart.core.util.SecurityUtil;
 import com.techmart.core.util.ValidationUtil;
 import com.techmart.ejb.repository.UserRepository;
 import com.techmart.ejb.repository.UserStatusRepository;
+import com.techmart.ejb.repository.UserTypeRepository;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
-
-import java.sql.Timestamp;
-import java.time.Instant;
+import jakarta.inject.Inject;
 
 @Stateless
 public class UserServiceBean implements UserService {
@@ -28,6 +28,12 @@ public class UserServiceBean implements UserService {
 
     @EJB
     private EmailService emailService;
+
+    @EJB
+    private UserTypeRepository typeRepository;
+
+    @Inject
+    private UserMapper userMapper;
 
     @Override
     public void register(UserDTO userDTO) {
@@ -76,10 +82,12 @@ public class UserServiceBean implements UserService {
         String token = SecurityUtil.generateVerificationToken();
         user.setVerificationToken(token);
 
-        user.setCreatedAt(Timestamp.from(Instant.now()));
+//        user.setCreatedAt(Timestamp.from(Instant.now()));
 
         UserStatus status = statusRepository.findStatusById(UserStatusType.UNVERIFIED.getId());
         user.setUserStatus(status);
+
+        user.setUserType(typeRepository.findTypeById(UserType.USER.getId()));
 
         String link =
                 "http://localhost:8080/techmart/verify?token="
@@ -100,8 +108,8 @@ public class UserServiceBean implements UserService {
         }
 
         UserStatus status = statusRepository.findStatusById(UserStatusType.VERIFIED.getId());
-
         user.setUserStatus(status);
+
         user.setVerificationToken(null);
         repository.update(user);
     }
@@ -135,6 +143,6 @@ public class UserServiceBean implements UserService {
             throw new RuntimeException("Invalid email or password.");
         }
 
-        return UserMapper.toDTO(user);
+        return userMapper.toDTO(user);
     }
 }

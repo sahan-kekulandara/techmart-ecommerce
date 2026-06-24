@@ -1,31 +1,31 @@
 package com.techmart.core.mapper;
 
-import com.techmart.core.dto.UserStatusDTO;
-import com.techmart.core.entity.UserStatus;
+import com.techmart.core.dto.ProductStatusDTO;
+import com.techmart.core.entity.Product;
+import com.techmart.core.entity.ProductStatus;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class UserStatusMapper {
+public class ProductStatusMapper {
 
-    public UserStatusDTO toDTO(UserStatus entity) {
+    public ProductStatusDTO toDTO(ProductStatus entity) {
         if (entity == null) {
             return null;
         }
 
-        UserStatusDTO dto = new UserStatusDTO();
+        ProductStatusDTO dto = new ProductStatusDTO();
         dto.setId(entity.getId());
         dto.setStatus(entity.getStatus());
 
         return dto;
     }
 
-
-    public UserStatus toEntity(UserStatusDTO dto) {
+    public ProductStatus toEntity(ProductStatusDTO dto) {
         if (dto == null) {
             return null;
         }
 
-        UserStatus entity = new UserStatus();
+        ProductStatus entity = new ProductStatus();
         entity.setId(dto.getId());
         entity.setStatus(dto.getStatus());
 
