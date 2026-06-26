@@ -167,7 +167,7 @@
 
     <div class="row mt-5">
         <div class="col-12 text-end">
-            <a href="products.jsp"
+            <a href="products"
                class="text-decoration-none fw-bold text-primary d-inline-flex align-items-center gap-1 group-hover"
                style="font-size: 0.95rem; transition: color 0.2s ease;">
                 <span>Explore Entire Catalog</span>

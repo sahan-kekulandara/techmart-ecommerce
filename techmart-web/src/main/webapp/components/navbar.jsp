@@ -30,8 +30,9 @@
 
       <hr class="d-lg-none my-3 text-muted">
       <div class="navbar-nav align-items-lg-center gap-3">
-        <form action="search" method="GET" class="position-relative me-lg-2 d-none d-sm-block">
-          <input type="search" name="query" class="form-control form-control-sm bg-light border-0 rounded-pill px-3 py-2 text-dark small" placeholder="Search tech hardware..." style="width: 210px; font-size: 0.85rem;">
+
+        <form action="products" method="GET" class="position-relative me-lg-2 d-none d-sm-block">
+          <input type="search" name="search" class="form-control form-control-sm bg-light border-0 rounded-pill px-3 py-2 text-dark small" placeholder="Search tech hardware..." style="width: 210px; font-size: 0.85rem;">
           <i class="bi bi-search position-absolute end-0 top-50 translate-middle-y me-3 text-secondary small"></i>
         </form>
 

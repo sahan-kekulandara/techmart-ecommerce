@@ -11,6 +11,7 @@ import jakarta.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Stateless
 public class CategoryServiceBean
@@ -24,14 +25,8 @@ public class CategoryServiceBean
 
     @Override
     public List<CategoryDTO> findAll() {
-        List<Category> categories = repository.findAll();
-        List<CategoryDTO> dtos = new ArrayList<>();
-
-        for (Category c : categories) {
-            CategoryDTO dto = categoryMapper.toDTO(c);
-            dtos.add(dto);
-        }
-
-        return dtos;
+        return repository.findAll()
+                .stream()
+                .map(categoryMapper::toDTO).collect(Collectors.toList());
     }
 }

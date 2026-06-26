@@ -1,4 +1,32 @@
+<%@ page import="com.techmart.core.dto.CategoryDTO" %>
+<%@ page import="com.techmart.core.dto.ProductDTO" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Arrays" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    List<CategoryDTO> categories = (List<CategoryDTO>) request.getAttribute("categories");
+    List<ProductDTO> products = (List<ProductDTO>) request.getAttribute("products");
+
+    String currentSearch = (request.getAttribute("currentSearch") != null) ? (String) request.getAttribute("currentSearch") : "";
+    String currentSort = (request.getAttribute("currentSort") != null) ? (String) request.getAttribute("currentSort") : "latest";
+    String currentStockStatus = (request.getAttribute("currentStockStatus") != null) ? (String) request.getAttribute("currentStockStatus") : "all";
+
+    String[] currentCategoryIds = (request.getAttribute("currentCategoryIds") != null) ? (String[]) request.getAttribute("currentCategoryIds") : new String[0];
+    List<String> selectedCatList = Arrays.asList(currentCategoryIds);
+
+    int activePage = (request.getAttribute("activePage") != null) ? (Integer) request.getAttribute("activePage") : 1;
+    int totalPages = (request.getAttribute("totalPages") != null) ? (Integer) request.getAttribute("totalPages") : 1;
+    long totalProducts = (request.getAttribute("totalProducts") != null) ? (Long) request.getAttribute("totalProducts") : 0L;
+    int startElement = (request.getAttribute("startElement") != null) ? (Integer) request.getAttribute("startElement") : 0;
+    int endElement = (request.getAttribute("endElement") != null) ? (Integer) request.getAttribute("endElement") : 0;
+
+    String queryString = request.getQueryString();
+    if (queryString == null) {
+        queryString = "";
+    }
+
+    queryString = queryString.replaceAll("&?page=\\d+", "");
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,123 +38,18 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
-
     <style>
-        /* Modern CSS Design Tokens */
-        :root {
-            --tm-primary: #2563eb;
-            --tm-primary-hover: #1d4ed8;
-            --tm-primary-light: #eff6ff;
-            --tm-bg-workspace: #f8fafc;
-            --tm-card-bg: #ffffff;
-            --tm-text-main: #0f172a;
-            --tm-text-muted: #64748b;
-            --tm-border: #e2e8f0;
-            --tm-radius-lg: 16px;
-            --tm-radius-md: 12px;
-            --tm-radius-sm: 8px;
-            --font-jakarta: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        body {
-            font-family: var(--font-jakarta);
-            background-color: var(--tm-bg-workspace);
-            color: var(--tm-text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Sidebar Glassmorphism Styles */
-        .filter-sidebar {
-            background-color: var(--tm-card-bg);
-            border-radius: var(--tm-radius-lg);
-            border: 1px solid var(--tm-border);
-        }
-
-        .form-check-input:checked {
-            background-color: var(--tm-primary);
-            border-color: var(--tm-primary);
-        }
-
-        /* Modernized Elegant Product Grid Cards */
-        .product-catalog-card {
-            background-color: var(--tm-card-bg);
-            border-radius: var(--tm-radius-lg);
-            border: 1px solid var(--tm-border) !important;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-        }
-
-        .product-catalog-card:hover {
-            transform: translateY(-6px);
-            border-color: #cbd5e1 !important;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
-        }
-
-        /* Perfect Image Wrapping Scale */
-        .catalog-img-wrapper {
-            background: linear-gradient(145deg, #f8fafc, #f1f5f9);
-            border-radius: var(--tm-radius-md);
-            height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            margin: 4px;
-            transition: background 0.3s ease;
-        }
-
-        .product-catalog-card:hover .catalog-img-wrapper {
-            background: linear-gradient(145deg, #f1f5f9, #e2e8f0);
-        }
-
-        /* Badge Formatting overrides */
-        .badge-status {
-            font-weight: 600;
-            font-size: 0.75rem;
-            letter-spacing: 0.025em;
-            padding: 6px 12px;
-            border-radius: var(--tm-radius-sm);
-        }
-
-        /* Pagination Accent Overrides */
-        .pagination {
-            gap: 6px;
-        }
-        .page-item .page-link {
-            border: 1px solid var(--tm-border);
-            border-radius: var(--tm-radius-sm) !important;
-            color: var(--tm-text-main);
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-        }
-        .page-item.active .page-link {
-            background-color: var(--tm-primary);
-            border-color: var(--tm-primary);
-            color: white;
-        }
-        .page-item:not(.active) .page-link:hover {
-            background-color: var(--tm-primary-light);
-            color: var(--tm-primary);
-            border-color: rgba(37, 99, 235, 0.3);
-        }
-
-        /* Custom line clamp utility */
-        .text-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            height: 40px;
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; bg-color: #f8f9fa; }
+        .filter-sidebar { border-radius: 16px; border: 1px solid #eef0f2; }
+        .product-catalog-card { border-radius: 16px; border: 1px solid #eef0f2; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .product-catalog-card:hover { transform: translateY(-4px); box-shadow: 0 12px 20px rgba(0,0,0,0.05) !important; }
+        .catalog-img-wrapper { height: 180px; bg-color: #f8f9fa; border-radius: 12px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .text-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     </style>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100 bg-light">
 
-<jsp:include page="components/navbar.jsp" />
+<jsp:include page="components/navbar.jsp"/>
 
 <main class="container-fluid px-3 px-md-5 py-5 flex-grow-1">
 
@@ -137,8 +60,10 @@
                 <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">Search Catalog</li>
             </ol>
         </nav>
-        <h2 class="fw-extrabold tracking-tight m-0 text-dark" style="font-weight: 800;">Showing results for <span class="text-primary">"Laptops"</span></h2>
-        <p class="text-muted m-0 mt-1">Found 24 premium hardware items matching your parameters.</p>
+        <h2 class="fw-extrabold tracking-tight m-0 text-dark" style="font-weight: 800;">
+            Showing results for <span class="text-primary">"<%= !currentSearch.isEmpty() ? currentSearch : "All Items" %>"</span>
+        </h2>
+        <p class="text-muted m-0 mt-1">Found <%= totalProducts %> premium hardware items matching your parameters.</p>
     </div>
 
     <div class="row g-4">
@@ -149,65 +74,65 @@
                     <h5 class="fw-bold text-dark m-0 d-flex align-items-center gap-2" style="font-size: 1.1rem;">
                         <i class="bi bi-sliders2 text-primary"></i> Filter Options
                     </h5>
-                    <a href="products.jsp" class="text-decoration-none small text-muted hover:text-primary fw-medium">Clear All</a>
+                    <a href="products" class="text-decoration-none small text-muted hover:text-primary fw-medium">Clear All</a>
                 </div>
 
-                <form action="products" method="GET">
+                <form id="catalogFilterForm" action="products" method="GET">
+
+                    <input type="hidden" name="search" value="<%= currentSearch %>">
+
+                    <input type="hidden" id="hiddenSortOrder" name="sort" value="<%= currentSort %>">
 
                     <div class="mb-4">
                         <label class="form-label fw-bold text-dark small text-uppercase tracking-wider opacity-75">Product Categories</label>
-                        <div class="d-flex flex-column gap-2.5 mt-2">
+                        <div class="d-flex flex-column gap-2 mt-2">
+                            <% if (categories != null) { %>
+                            <% for (CategoryDTO category : categories) {
+                                String catIdStr = String.valueOf(category.getId());
+                                boolean isChecked = selectedCatList.contains(catIdStr);
+                            %>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="cat1" checked>
-                                <label class="form-check-label small text-secondary fw-medium" for="cat1">Laptops & Computers</label>
+                                <input class="form-check-input" type="checkbox" name="category"
+                                       value="<%=category.getId()%>" id="cat_<%=category.getId()%>"
+                                    <%= isChecked ? "checked" : "" %>>
+                                <label class="form-check-label small text-secondary fw-medium" for="cat_<%=category.getId()%>">
+                                    <%=category.getCategory()%>
+                                </label>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="cat2">
-                                <label class="form-check-label small text-secondary fw-medium" for="cat2">Displays & Monitors</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="cat3">
-                                <label class="form-check-label small text-secondary fw-medium" for="cat3">Audio Equipment</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="cat4">
-                                <label class="form-check-label small text-secondary fw-medium" for="cat4">Peripherals & Add-ons</label>
-                            </div>
+                            <% } %>
+                            <% } %>
                         </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-dark small text-uppercase tracking-wider opacity-75">Manufacturer / Brand</label>
-                        <select name="brand" class="form-select form-select-md mt-2 bg-light border-0 py-2.5 px-3 rounded-3 small fw-medium">
-                            <option value="all">All Available Brands</option>
-                            <option value="apple">Apple Inc.</option>
-                            <option value="dell">Dell</option>
-                            <option value="sony">Sony Electronics</option>
-                            <option value="logitech">Logitech G</option>
-                        </select>
                     </div>
 
                     <div class="mb-4">
                         <label class="form-label fw-bold text-dark small text-uppercase tracking-wider opacity-75">Price Range ($)</label>
                         <div class="row g-2 mt-1">
                             <div class="col-6">
-                                <input type="number" name="min_price" class="form-control bg-light border-0 py-2.5 text-center small rounded-3" placeholder="Min">
+                                <input type="number" name="min_price"
+                                       class="form-control bg-light border-0 py-2.5 text-center small rounded-3"
+                                       placeholder="Min"
+                                       value="<%= (request.getAttribute("currentMinPrice") != null) ? request.getAttribute("currentMinPrice") : "" %>">
                             </div>
                             <div class="col-6">
-                                <input type="number" name="max_price" class="form-control bg-light border-0 py-2.5 text-center small rounded-3" placeholder="Max">
+                                <input type="number" name="max_price"
+                                       class="form-control bg-light border-0 py-2.5 text-center small rounded-3"
+                                       placeholder="Max"
+                                       value="<%= (request.getAttribute("currentMaxPrice") != null) ? request.getAttribute("currentMaxPrice") : "" %>">
                             </div>
                         </div>
                     </div>
 
                     <div class="mb-4">
                         <label class="form-label fw-bold text-dark small text-uppercase tracking-wider opacity-75">Availability</label>
-                        <div class="d-flex flex-column gap-2.5 mt-2">
+                        <div class="d-flex flex-column gap-2 mt-2">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="stockStatus" id="stockAll" checked>
+                                <input class="form-check-input" type="radio" name="stockStatus" id="stockAll" value="all"
+                                    <%= "all".equals(currentStockStatus) ? "checked" : "" %>>
                                 <label class="form-check-label small text-secondary fw-medium" for="stockAll">All Catalog Items</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="stockStatus" id="stockIn">
+                                <input class="form-check-input" type="radio" name="stockStatus" id="stockIn" value="in_stock"
+                                    <%= "in_stock".equals(currentStockStatus) ? "checked" : "" %>>
                                 <label class="form-check-label small text-secondary fw-medium" for="stockIn">Exclude Out of Stock</label>
                             </div>
                         </div>
@@ -224,110 +149,101 @@
 
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3 bg-white p-3 rounded-4 border">
                 <div class="small text-muted fw-medium">
-                    Showing <span class="text-dark fw-bold">1 - 3</span> of <span class="text-dark fw-bold">24</span> elements
+                    Showing <span class="text-dark fw-bold"><%= startElement %> - <%= endElement %></span> of <span class="text-dark fw-bold"><%= totalProducts %></span> elements
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
                     <label class="small text-muted text-nowrap m-0 fw-medium" for="sortOrder">Sort By:</label>
-                    <select id="sortOrder" name="sort" class="form-select form-select-sm border-0 bg-light py-2 px-3 rounded-3 text-dark fw-semibold" style="width: 180px; font-size:0.85rem;">
-                        <option value="latest">Newest Releases</option>
-                        <option value="price_low">Price: Low to High</option>
-                        <option value="price_high">Price: High to Low</option>
-                        <option value="popular">Most Popular</option>
+                    <select id="sortOrder" class="form-select form-select-sm border-0 bg-light py-2 px-3 rounded-3 text-dark fw-semibold"
+                            style="width: 180px; font-size:0.85rem;" onchange="submitSortingForm(this.value)">
+                        <option value="latest" <%= "latest".equals(currentSort) ? "selected" : "" %>>Newest Releases</option>
+                        <option value="price_low" <%= "price_low".equals(currentSort) ? "selected" : "" %>>Price: Low to High</option>
+                        <option value="price_high" <%= "price_high".equals(currentSort) ? "selected" : "" %>>Price: High to Low</option>
                     </select>
                 </div>
             </div>
 
             <div class="row g-4 mb-5">
-
+                <% if (products != null && !products.isEmpty()) { %>
+                <% for (ProductDTO product : products) { %>
                 <div class="col-12 col-sm-6 col-md-4">
                     <div class="card product-catalog-card h-100 p-2 shadow-sm">
                         <div class="catalog-img-wrapper">
                             <i class="bi bi-laptop text-primary opacity-50" style="font-size: 3.5rem;"></i>
-                            <span class="badge badge-status bg-success position-absolute top-3 start-3 shadow-sm">In Stock</span>
+                            <span class="badge position-absolute top-3 start-3 shadow-sm <%= (product.getQty() > 0) ? "bg-success" : "bg-danger" %>">
+                                    <%= (product.getQty() > 0) ? "In Stock" : "Out of Stock" %>
+                                </span>
                         </div>
                         <div class="card-body px-2 pt-3 pb-2 d-flex flex-column">
-                            <span class="text-muted small fw-bold text-uppercase font-monospace tracking-wider" style="font-size:0.7rem;">Apple</span>
-                            <h6 class="fw-bold text-dark mt-1 mb-1 text-truncate" style="font-size: 1.05rem;">MacBook Pro 16" M3 Max</h6>
-                            <p class="text-muted small mb-3 text-clamp-2">16-core CPU, 40-core GPU, 48GB unified memory powerhouse layout.</p>
+                                <span class="text-muted small fw-bold text-uppercase font-monospace tracking-wider" style="font-size:0.7rem;">
+                                    <%= (product.getSubcategory() != null) ? product.getSubcategory().getSubcategory() : "Hardware" %>
+                                </span>
+                            <h6 class="fw-bold text-dark mt-1 mb-1 text-truncate" style="font-size: 1.05rem;">
+                                <%= product.getTitle() %>
+                            </h6>
+                            <p class="text-muted small mb-3 text-clamp-2">
+                                <%= product.getDescription() %>
+                            </p>
                             <div class="d-flex align-items-center justify-content-between mt-auto pt-2 border-top border-light">
-                                <span class="fs-5 fw-bold text-dark" style="font-weight: 800 !important;">$3,499.00</span>
-                                <button class="btn btn-primary btn-sm rounded-3 px-3 py-2 d-flex align-items-center gap-1">
+                                    <span class="fs-5 fw-bold text-dark" style="font-weight: 800 !important;">
+                                        $<%= String.format("%.2f", product.getPrice()) %>
+                                    </span>
+                                <button class="btn btn-primary btn-sm rounded-3 px-3 py-2 d-flex align-items-center gap-1" <%= (product.getQty() <= 0) ? "disabled" : "" %>>
                                     <i class="bi bi-cart-plus"></i> Add
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-12 col-sm-6 col-md-4">
-                    <div class="card product-catalog-card h-100 p-2 shadow-sm">
-                        <div class="catalog-img-wrapper">
-                            <i class="bi bi-laptop text-primary opacity-50" style="font-size: 3.5rem;"></i>
-                            <span class="badge badge-status bg-success position-absolute top-3 start-3 shadow-sm">In Stock</span>
-                        </div>
-                        <div class="card-body px-2 pt-3 pb-2 d-flex flex-column">
-                            <span class="text-muted small fw-bold text-uppercase font-monospace tracking-wider" style="font-size:0.7rem;">Dell</span>
-                            <h6 class="fw-bold text-dark mt-1 mb-1 text-truncate" style="font-size: 1.05rem;">XPS 15 Creator Edition</h6>
-                            <p class="text-muted small mb-3 text-clamp-2">Intel Core i9, 32GB DDR5 RAM, 1TB NVMe SSD storage system.</p>
-                            <div class="d-flex align-items-center justify-content-between mt-auto pt-2 border-top border-light">
-                                <span class="fs-5 fw-bold text-dark" style="font-weight: 800 !important;">$2,199.00</span>
-                                <button class="btn btn-primary btn-sm rounded-3 px-3 py-1.5 d-flex align-items-center gap-1.5 fw-semibold border-0">
-                                    <i class="bi bi-cart-plus-fill"></i> Add
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                <% } %>
+                <% } else { %>
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-search text-muted" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3 fw-bold text-secondary">No Products Found</h4>
+                    <p class="text-muted">We couldn't find anything matching your search parameters. Try another item!</p>
                 </div>
-
-                <div class="col-12 col-sm-6 col-md-4">
-                    <div class="card product-catalog-card h-100 p-2 shadow-sm opacity-90">
-                        <div class="catalog-img-wrapper">
-                            <i class="bi bi-laptop text-secondary opacity-25" style="font-size: 3.5rem;"></i>
-                            <span class="badge badge-status bg-secondary position-absolute top-3 start-3 shadow-sm">Out of Stock</span>
-                        </div>
-                        <div class="card-body px-2 pt-3 pb-2 d-flex flex-column">
-                            <span class="text-muted small fw-bold text-uppercase font-monospace tracking-wider" style="font-size:0.7rem;">Apple</span>
-                            <h6 class="fw-bold text-muted mt-1 mb-1 text-truncate" style="font-size: 1.05rem;">MacBook Air 13" M2</h6>
-                            <p class="text-muted small mb-3 text-clamp-2">Ultra-thin framework, 8GB unified memory, 256GB lightning fast flash array.</p>
-                            <div class="d-flex align-items-center justify-content-between mt-auto pt-2 border-top border-light">
-                                <span class="fs-5 fw-bold text-muted" style="font-weight: 700 !important;">$1,099.00</span>
-                                <button class="btn btn-light text-muted btn-sm rounded-3 px-3 py-1.5 fw-semibold" disabled>
-                                    Sold Out
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+                <% } %>
             </div>
 
+            <% if (totalPages > 1) { %>
             <nav aria-label="Catalog Page Vector Navigation" class="d-flex justify-content-center">
                 <ul class="pagination pagination-md p-0 m-0">
-                    <li class="page-item disabled">
-                        <a class="page-link d-flex align-items-center px-3 py-2" href="#" tabindex="-1" aria-disabled="true">
+                    <li class="page-item <%= (activePage == 1) ? "disabled" : "" %>">
+                        <a class="page-link d-flex align-items-center px-3 py-2"
+                           href="<%= (activePage == 1) ? "#" : "?" + queryString + "&page=" + (activePage - 1) %>">
                             <i class="bi bi-chevron-left me-1"></i> Prev
                         </a>
                     </li>
-                    <li class="page-item active" aria-current="page"><a class="page-link px-3 py-2" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link px-3 py-2" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link px-3 py-2" href="#">3</a></li>
-                    <li class="page-item">
-                        <a class="page-link d-flex align-items-center px-3 py-2" href="#">
+
+                    <% for (int i = 1; i <= totalPages; i++) { %>
+                    <li class="page-item <%= (activePage == i) ? "active" : "" %>">
+                        <a class="page-link px-3 py-2" href="?<%= queryString %>&page=<%= i %>"><%= i %></a>
+                    </li>
+                    <% } %>
+
+                    <li class="page-item <%= (activePage == totalPages) ? "disabled" : "" %>">
+                        <a class="page-link d-flex align-items-center px-3 py-2"
+                           href="<%= (activePage == totalPages) ? "#" : "?" + queryString + "&page=" + (activePage + 1) %>">
                             Next <i class="bi bi-chevron-right ms-1"></i>
                         </a>
                     </li>
                 </ul>
             </nav>
+            <% } %>
 
         </div>
-
     </div>
-
 </main>
 
-<jsp:include page="components/footer.jsp" />
+<jsp:include page="components/footer.jsp"/>
 
+<script>
+    // Feeds dropdown values inside the form and submits natively to preserve state metrics together
+    function submitSortingForm(sortValue) {
+        document.getElementById('hiddenSortOrder').value = sortValue;
+        document.getElementById('catalogFilterForm').submit();
+    }
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
