@@ -16,7 +16,7 @@ import java.io.Serializable;
 public class ProductImageDTO implements Serializable {
 
     private Integer id;
-    private Product product;
+    private ProductDTO product;
     private String imagePath;
     private Boolean isPrimary = false;
 }

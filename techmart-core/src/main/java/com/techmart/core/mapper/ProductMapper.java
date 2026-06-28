@@ -1,9 +1,13 @@
 package com.techmart.core.mapper;
 
 import com.techmart.core.dto.ProductDTO;
+import com.techmart.core.dto.ProductImageDTO;
+import com.techmart.core.dto.ProductSuggestionDTO;
 import com.techmart.core.entity.Product;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+
+import java.util.List;
 
 @ApplicationScoped
 public class ProductMapper {
@@ -35,6 +39,19 @@ public class ProductMapper {
             dto.setProductStatus(productStatusMapper.toDTO(entity.getProductStatus()));
         }
 
+        if (entity.getImages() != null && !entity.getImages().isEmpty()) {
+            List<ProductImageDTO> imageDTOs = entity.getImages().stream()
+                    .map(img -> ProductImageDTO.builder()
+                            .id(img.getId().intValue())
+                            .product(dto)
+                            .imagePath(img.getImagePath())
+                            .isPrimary(img.getIsPrimary())
+                            .build())
+                    .collect(java.util.stream.Collectors.toList());
+
+            dto.setImages(imageDTOs);
+        }
+
         return dto;
     }
 
@@ -60,5 +77,23 @@ public class ProductMapper {
         }
 
         return entity;
+    }
+
+    public ProductSuggestionDTO toSuggestionDTO(Product product) {
+        if (product == null) {
+            return null;
+        }
+
+        String primaryImagePath = product.getImages().stream()
+                .filter(img -> Boolean.TRUE.equals(img.getIsPrimary()))
+                .map(img -> img.getImagePath())
+                .findFirst()
+                .orElse(product.getImages().isEmpty() ? null : product.getImages().get(0).getImagePath());
+
+        return ProductSuggestionDTO.builder()
+                .id(product.getId())
+                .title(product.getTitle())
+                .image(primaryImagePath)
+                .build();
     }
 }

@@ -25,6 +25,6 @@ public class ProductImage implements Serializable {
     @Column(name = "image_path", nullable = false, length = 255)
     private String imagePath;
 
-    @Column(name = "is_primary")
+    @Column(name = "is_primary",nullable = false)
     private Boolean isPrimary = false;
 }

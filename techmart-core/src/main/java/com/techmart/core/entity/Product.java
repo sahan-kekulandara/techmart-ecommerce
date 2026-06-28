@@ -8,6 +8,8 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "product")
@@ -43,8 +45,21 @@ public class Product implements Serializable {
     @JoinColumn(name = "product_status_id", nullable = false)
     private ProductStatus productStatus;
 
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> images = new ArrayList<>();
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = Timestamp.from(Instant.now());
+    }
+
+    public void addImage(ProductImage image) {
+        images.add(image);
+        image.setProduct(this);
+    }
+
+    public void removeImage(ProductImage image) {
+        images.remove(image);
+        image.setProduct(null);
     }
 }

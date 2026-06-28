@@ -113,7 +113,7 @@
             <% if (categories != null) { %>
             <% for (CategoryDTO category : categories) { %>
             <div class="col-6 col-sm-4 col-md-3 col-xl-2">
-                <a href="products?categoryId=<%= category.getId() %>"
+                <a href="products?category=<%= category.getId() %>"
                    class="category-showcase-card d-flex flex-column align-items-center p-4 text-center h-100">
                     <i class="bi bi-grid text-primary mb-2" style="font-size:2.2rem;"></i>
                     <span class="small fw-bold text-dark">
@@ -137,20 +137,42 @@
         </div>
 
         <div class="row g-4">
-            <% if (products != null) { %>
+            <% if (products != null && !products.isEmpty()) { %>
             <% for (ProductDTO p : products) { %>
             <div class="col-12 col-sm-6 col-md-4 col-xl-3">
                 <div class="card product-card bg-white h-100 p-3 border-0 shadow-sm">
-                    <div class="product-img-wrapper position-relative">
-                        <i class="bi bi-laptop text-secondary opacity-25" style="font-size: 4rem;"></i>
+                    <div class="product-img-wrapper position-relative text-center d-flex align-items-center justify-content-center bg-light rounded-3 overflow-hidden" style="height: 180px;">
+                        <%
+                            // Set default secure placeholder path
+                            String imgUrl = "product-image?path=products/placeholder.jpg";
+
+                            // Safely extract the primary or fallback thumbnail image path
+                            if (p.getImages() != null && !p.getImages().isEmpty()) {
+                                String imagePath = p.getImages().stream()
+                                        .filter(img -> Boolean.TRUE.equals(img.getIsPrimary()))
+                                        .map(com.techmart.core.dto.ProductImageDTO::getImagePath)
+                                        .findFirst()
+                                        .orElse(p.getImages().get(0).getImagePath());
+
+                                imgUrl = "product-image?path=" + imagePath;
+                            }
+                        %>
+
+                        <img src="<%= imgUrl %>"
+                             class="img-fluid h-100 w-100 object-fit-contain p-2"
+                             alt="<%= p.getTitle() %>"
+                             onerror="this.src='product-image?path=products/placeholder.jpg';">
+
                         <span class="badge bg-danger position-absolute top-0 start-0 m-2 px-2.5 py-1.5 rounded-2 small fw-bold">New Release</span>
                     </div>
                     <div class="card-body px-1 pt-3 pb-0 d-flex flex-column">
-                        <span class="text-muted small fw-medium text-uppercase font-monospace"><%=p.getSubcategory().getSubcategory()%></span>
-                        <h6 class="fw-bold text-dark mt-1 mb-2 text-truncate"><%=p.getTitle()%></h6>
-                        <p class="text-muted small mb-3"><%=p.getDescription()%></p>
+                <span class="text-muted small fw-medium text-uppercase font-monospace">
+                    <%= (p.getSubcategory() != null) ? p.getSubcategory().getSubcategory() : "Hardware" %>
+                </span>
+                        <h6 class="fw-bold text-dark mt-1 mb-2 text-truncate"><%= p.getTitle() %></h6>
+                        <p class="text-muted small mb-3 text-clamp-2"><%= p.getDescription() %></p>
                         <div class="d-flex align-items-center justify-content-between mt-auto pt-2">
-                            <span class="fs-5 fw-extrabold text-dark">$ <%=p.getPrice()%></span>
+                            <span class="fs-5 fw-extrabold text-dark">$<%= String.format("%.2f", p.getPrice()) %></span>
                             <button class="btn btn-primary btn-sm rounded-3 px-3 py-2 d-flex align-items-center gap-1">
                                 <i class="bi bi-cart-plus"></i> Add
                             </button>
@@ -160,10 +182,9 @@
             </div>
             <% } %>
             <% } else { %>
-            <div class="col-12 text-muted">No product available. Please load via home page.</div>
+            <div class="col-12 text-muted text-center py-4">No product available. Please load via home page.</div>
             <% } %>
-        </div>
-    </div>
+        </div>    </div>
 
     <div class="row mt-5">
         <div class="col-12 text-end">

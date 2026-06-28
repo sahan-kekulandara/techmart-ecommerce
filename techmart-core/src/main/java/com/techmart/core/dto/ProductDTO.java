@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @Builder
@@ -27,4 +28,5 @@ public class ProductDTO implements Serializable {
     private Timestamp createdAt;
     private SubcategoryDTO subcategory;
     private ProductStatusDTO productStatus;
+    private List<ProductImageDTO> images;
 }

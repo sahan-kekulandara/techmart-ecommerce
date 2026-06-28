@@ -26,6 +26,8 @@ public class ProductServlet extends HttpServlet {
     @EJB
     private ProductService productService;
 
+    private static final int DEFAULT_PAGE_SIZE = 9;
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         ProductFilterDTO filter = new ProductFilterDTO();
@@ -39,9 +41,7 @@ public class ProductServlet extends HttpServlet {
                     .filter(id -> id != null && !id.trim().isEmpty())
                     .map(Long::parseLong)
                     .collect(Collectors.toList());
-            if (!categoryIds.isEmpty()) {
-                filter.setCategoryIds(categoryIds);
-            }
+            filter.setCategoryIds(categoryIds);
         }
 
         String minPriceParam = req.getParameter("min_price");
@@ -55,13 +55,23 @@ public class ProductServlet extends HttpServlet {
         }
 
         String stockStatus = req.getParameter("stockStatus");
-        filter.setStockOnly("in_stock".equals(stockStatus));
+        if ("in_stock".equals(stockStatus)) {
+            filter.setStockOnly(true);
+        }
 
+        int activePage = 1;
         String pageParam = req.getParameter("page");
-        int activePage = (pageParam != null && !pageParam.trim().isEmpty()) ? Integer.parseInt(pageParam) : 1;
-        if (activePage < 1) activePage = 1;
+        if (pageParam != null && !pageParam.trim().isEmpty()) {
+            try {
+                activePage = Integer.parseInt(pageParam);
+                if (activePage < 1) activePage = 1;
+            } catch (NumberFormatException e) {
+                activePage = 1;
+            }
+        }
+
         filter.setPage(activePage);
-        filter.setSize(9);
+        filter.setSize(DEFAULT_PAGE_SIZE);
 
         List<ProductDTO> products = productService.search(filter);
         long totalProducts = productService.countSearch(filter);
@@ -83,9 +93,9 @@ public class ProductServlet extends HttpServlet {
         req.setAttribute("currentSearch", filter.getSearch());
         req.setAttribute("currentSort", filter.getSort());
         req.setAttribute("currentMinPrice", filter.getMinPrice());
-        req.setAttribute("currentCategoryIds", categoryParams); // Array keeps checkboxes checked in UI
+        req.setAttribute("currentCategoryIds", categoryParams);
         req.setAttribute("currentMaxPrice", filter.getMaxPrice());
-        req.setAttribute("currentStockStatus", req.getParameter("stockStatus"));
+        req.setAttribute("currentStockStatus", stockStatus);
         req.setAttribute("categories", categoryService.findAll());
 
         req.getRequestDispatcher("/product.jsp").forward(req, resp);
