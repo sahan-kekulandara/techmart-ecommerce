@@ -4,6 +4,7 @@ import com.techmart.core.dto.ProductFilterDTO;
 import com.techmart.core.entity.Product;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 
@@ -126,5 +127,16 @@ public class ProductRepository {
                 .setParameter("keyword", searchParam)
                 .setMaxResults(8)
                 .getResultList();
+    }
+
+    public Product findProductWithImagesById(Long id) {
+        try {
+            return em.createQuery(
+                            "SELECT p FROM Product p LEFT JOIN FETCH p.images WHERE p.id = :id", Product.class)
+                    .setParameter("id", id)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 }

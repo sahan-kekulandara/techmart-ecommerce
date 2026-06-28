@@ -22,23 +22,27 @@
             display: flex;
             flex-direction: column;
         }
+
         .view-wrapper-card {
             background-color: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 20px;
         }
+
         .gallery-carousel {
             background: linear-gradient(145deg, #f8fafc, #f1f5f9);
             border-radius: 16px;
             overflow: hidden;
             border: 1px solid #e2e8f0;
         }
+
         .carousel-item img {
             height: 420px;
             object-fit: contain;
             width: 100%;
             padding: 2rem;
         }
+
         .thumb-gallery-btn {
             width: 70px;
             height: 70px;
@@ -50,25 +54,30 @@
             padding: 4px;
             transition: all 0.2s ease;
         }
+
         .thumb-gallery-btn.active, .thumb-gallery-btn:hover {
             border-color: #2563eb;
             transform: scale(1.05);
         }
+
         .qty-input-group {
             max-width: 130px;
             border: 1px solid #cbd5e1;
             border-radius: 10px;
             overflow: hidden;
         }
+
         .qty-btn {
             background-color: #f1f5f9;
             border: 0;
             width: 38px;
             transition: background 0.2s;
         }
+
         .qty-btn:hover {
             background-color: #e2e8f0;
         }
+
         .spec-table th {
             width: 30%;
             color: #64748b;
@@ -94,17 +103,26 @@
         <div class="row g-5">
 
             <div class="col-12 col-lg-6">
-                <div id="productImagesCarousel" class="carousel slide gallery-carousel" data-bs-ride="false">
+                <%-- Extract primary image path out of the nested array list model layer dynamically --%>
+                <c:set var="primaryImgPath" value="default-placeholder.png" />
+                <c:forEach var="img" items="${product.images}">
+                    <c:if test="${img.isPrimary || primaryImgPath == 'default-placeholder.png'}">
+                        <c:set var="primaryImgPath" value="${img.imagePath}" />
+                    </c:if>
+                </c:forEach>
 
+                <div id="productImagesCarousel" class="carousel slide gallery-carousel" data-bs-ride="false">
                     <div class="carousel-inner">
                         <div class="carousel-item active">
-                            <img src="uploads/products/${product.image}" class="d-block" alt="Primary View">
+                            <img src="product-image?path=${primaryImgPath}" class="d-block" alt="Primary View">
                         </div>
 
-                        <c:forEach var="subImg" items="${productImages}" varStatus="status">
-                            <div class="carousel-item">
-                                <img src="uploads/products/${subImg.imagePath}" class="d-block" alt="Gallery View ${status.count}">
-                            </div>
+                        <c:forEach var="subImg" items="${product.images}">
+                            <c:if test="${subImg.imagePath != primaryImgPath}">
+                                <div class="carousel-item">
+                                    <img src="product-image?path=${subImg.imagePath}" class="d-block" alt="Gallery View">
+                                </div>
+                            </c:if>
                         </c:forEach>
                     </div>
 
@@ -119,9 +137,9 @@
                 </div>
 
                 <div class="d-flex gap-2 justify-content-center mt-3 flex-wrap">
-                    <img src="uploads/products/${product.image}" class="thumb-gallery-btn active" data-bs-target="#productImagesCarousel" data-bs-slide-to="0" alt="Thumb 0">
-                    <c:forEach var="subImg" items="${productImages}" varStatus="status">
-                        <img src="uploads/products/${subImg.imagePath}" class="thumb-gallery-btn" data-bs-target="#productImagesCarousel" data-bs-slide-to="${status.count}" alt="Thumb ${status.count}">
+                    <img src="product-image?path=${primaryImgPath}" class="thumb-gallery-btn active" data-bs-target="#productImagesCarousel" data-bs-slide-to="0" alt="Thumb 0">
+                    <c:forEach var="subImg" items="${product.images}" varStatus="status">
+                        <img src="product-image?path=${subImg.imagePath}" class="thumb-gallery-btn" data-bs-target="#productImagesCarousel" data-bs-slide-to="${status.count}" alt="Thumb ${status.count}">
                     </c:forEach>
                 </div>
             </div>
@@ -129,7 +147,7 @@
             <div class="col-12 col-lg-6 d-flex flex-column">
 
                 <span class="badge bg-light text-primary border border-primary-subtle rounded-pill mb-2 align-self-start font-monospace tracking-wider small px-3 py-1.5 fw-bold">
-                    <c:out value="${product.subcategoryName}" default="Hardware Components"/>
+                    <c:out value="${product.subcategory.subcategory}" default="Hardware Components"/>
                 </span>
 
                 <h1 class="fw-extrabold text-dark tracking-tight mb-2" style="font-weight: 800;"><c:out value="${product.title}" default="Premium Hardware Unit"/></h1>
@@ -137,7 +155,7 @@
 
                 <div class="d-flex align-items-center gap-2 mb-4">
                     <c:choose>
-                        <c:when var="inStock" test="${product.qty > 0}">
+                        <c:when test="${product.qty > 0}">
                             <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1 small fw-semibold d-flex align-items-center gap-1">
                                 <i class="bi bi-patch-check-fill"></i> In Stock Ready to Deploy
                             </span>
@@ -167,16 +185,16 @@
                             <label class="small fw-bold text-muted">Purchase Qty</label>
 
                             <div class="input-group qty-input-group">
-                                <button class="qty-btn" type="button" onclick="adjustValue(-1)" ${!inStock ? 'disabled' : ''}>-</button>
+                                <button class="qty-btn" type="button" onclick="adjustValue(-1)" ${product.qty <= 0 ? 'disabled' : ''}>-</button>
                                 <input type="number" id="qtyInput" name="quantity" class="form-control text-center bg-transparent border-0 small p-0 fw-bold" value="1" min="1" max="${product.qty}" readonly>
-                                <button class="qty-btn" type="button" onclick="adjustValue(1)" ${!inStock ? 'disabled' : ''}>+</button>
+                                <button class="qty-btn" type="button" onclick="adjustValue(1)" ${product.qty <= 0 ? 'disabled' : ''}>+</button>
                             </div>
                         </div>
                     </div>
 
                     <div class="row g-2">
                         <div class="col-sm-8">
-                            <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm border-0 d-flex align-items-center justify-content-center gap-2" ${!inStock ? 'disabled' : ''}>
+                            <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm border-0 d-flex align-items-center justify-content-center gap-2" ${product.qty <= 0 ? 'disabled' : ''}>
                                 <i class="bi bi-cart-plus-fill fs-5"></i> Secure to Shopping Cart
                             </button>
                         </div>
@@ -199,15 +217,15 @@
                         <tbody>
                         <tr>
                             <th class="bg-light ps-3">Category Matrix</th>
-                            <td><c:out value="${product.categoryName}" default="Premium Hardware"/></td>
+                            <td><c:out value="${product.subcategory.category.category}" default="Premium Hardware"/></td>
                         </tr>
                         <tr>
                             <th class="bg-light ps-3">Sub-assignment</th>
-                            <td><c:out value="${product.subcategoryName}" default="Not Defined"/></td>
+                            <td><c:out value="${product.subcategory.subcategory}" default="Not Defined"/></td>
                         </tr>
                         <tr>
                             <th class="bg-light ps-3">Platform Status</th>
-                            <td>Active Retail Ledger Element</td>
+                            <td><c:out value="${product.productStatus.status}" default="Active Retail Ledger Element"/></td>
                         </tr>
                         </tbody>
                     </table>
@@ -227,7 +245,7 @@
         let maxLimit = parseInt(qtyField.getAttribute('max')) || 100;
 
         let targetVal = currentVal + change;
-        if(targetVal >= 1 && targetVal <= maxLimit) {
+        if (targetVal >= 1 && targetVal <= maxLimit) {
             qtyField.value = targetVal;
         }
     }
@@ -238,7 +256,7 @@
 
         carouselEl.addEventListener('slide.bs.carousel', function (e) {
             customThumbnails.forEach(thumb => thumb.classList.remove('active'));
-            if(customThumbnails[e.to]) {
+            if (customThumbnails[e.to]) {
                 customThumbnails[e.to].classList.add('active');
             }
         });

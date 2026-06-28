@@ -55,4 +55,19 @@ public class ProductServiceBean implements ProductService {
                 .map(productMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public ProductDTO getProductById(Long id) {
+        if (id == null) {
+            return null;
+        }
+
+        Product product = repository.findProductWithImagesById(id);
+
+        if (product == null) {
+            return null;
+        }
+
+        return productMapper.toDTO(product);
+    }
 }

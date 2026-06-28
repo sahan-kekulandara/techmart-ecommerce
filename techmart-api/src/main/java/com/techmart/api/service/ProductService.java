@@ -12,4 +12,6 @@ public interface ProductService {
     List<ProductDTO> findAll();
     public long countSearch(ProductFilterDTO filter);
     List<ProductSuggestionDTO> findSuggestions(String keyword);
+    public ProductDTO getProductById(Long id);
+
 }
