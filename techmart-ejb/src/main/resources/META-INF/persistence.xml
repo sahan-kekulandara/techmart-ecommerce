@@ -19,6 +19,7 @@
         <class>com.techmart.core.entity.ProductImage</class>
         <class>com.techmart.core.entity.Category</class>
         <class>com.techmart.core.entity.Subcategory</class>
+        <class>com.techmart.core.entity.UserAddress</class>
 
 
         <properties>

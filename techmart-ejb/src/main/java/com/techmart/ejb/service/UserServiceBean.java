@@ -145,4 +145,24 @@ public class UserServiceBean implements UserService {
 
         return userMapper.toDTO(user);
     }
+
+    @Override
+    public boolean updatePassword(Long userId, String oldPassword, String newPassword, String confirmPassword) {
+        if (newPassword == null || !newPassword.equals(confirmPassword)) {
+            return false;
+        }
+
+        User user = repository.findById(userId);
+        if (user == null) {
+            return false;
+        }
+
+        if (!user.getPassword().equals(oldPassword)) {
+            return false;
+        }
+
+        user.setPassword(newPassword);
+        repository.update(user);
+        return true;
+    }
 }
