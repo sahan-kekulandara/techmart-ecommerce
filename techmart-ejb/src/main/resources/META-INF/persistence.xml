@@ -20,6 +20,8 @@
         <class>com.techmart.core.entity.Category</class>
         <class>com.techmart.core.entity.Subcategory</class>
         <class>com.techmart.core.entity.UserAddress</class>
+        <class>com.techmart.core.entity.CartItem</class>
+        <class>com.techmart.core.entity.ShoppingCart</class>
 
 
         <properties>

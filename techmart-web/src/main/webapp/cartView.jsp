@@ -8,14 +8,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechMart - Shopping Cart</title>
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap"
-          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         body {
@@ -89,9 +86,9 @@
     </c:if>
 
     <div class="row g-4">
+        <%-- Updated condition to use the items collection inside our scoped shoppingCart DTO variable --%>
         <c:choose>
-            <c:when test="${empty cartItems || fn:length(cartItems) == 0}">
-                <!-- EMPTY CART FALLBACK STATE -->
+            <c:when test="${empty shoppingCart.items || fn:length(shoppingCart.items) == 0}">
                 <div class="col-12 text-center py-5 cart-card shadow-sm bg-white">
                     <i class="bi bi-cart-x display-3 text-muted d-block mb-3"></i>
                     <h4 class="fw-bold text-secondary">Your Cart is Empty</h4>
@@ -106,18 +103,15 @@
                 <div class="col-lg-8">
                     <div class="cart-card p-4 shadow-sm bg-white d-flex flex-column gap-4">
 
-                        <c:forEach var="item" items="${cartItems}">
+                        <c:forEach var="item" items="${shoppingCart.items}">
                             <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 pb-4 border-bottom border-light last-border-0">
 
-                                <!-- Product Details Context -->
                                 <div class="d-flex align-items-center gap-3 flex-grow-1">
-                                    <img src="uploads/products/${item.productImage}" class="cart-item-img"
-                                         alt="${item.productTitle}">
+                                        <%-- Corrected proxy servlet source target and mapped matching field signatures --%>
+                                    <img src="product-image?path=${item.productImagePath}" class="cart-item-img" alt="${item.productTitle}">
                                     <div style="max-width: 280px;">
-                                        <h6 class="fw-bold text-dark text-truncate mb-1"><c:out
-                                                value="${item.productTitle}"/></h6>
-                                        <span class="text-muted small">Unit Price: <strong>$<c:out
-                                                value="${item.price}"/></strong></span>
+                                        <h6 class="fw-bold text-dark text-truncate mb-1"><c:out value="${item.productTitle}"/></h6>
+                                        <span class="text-muted small">Unit Price: <strong>$<c:out value="${item.productPrice}"/></strong></span>
                                     </div>
                                 </div>
 
@@ -126,29 +120,19 @@
                                     <form action="cart-update" method="POST" class="m-0">
                                         <input type="hidden" name="cartItemId" value="${item.id}">
                                         <div class="input-group qty-adjust-group">
-                                            <button class="qty-adjust-btn" type="submit" name="action"
-                                                    value="decrease" ${item.quantity <= 1 ? 'disabled' : ''}>-
-                                            </button>
-                                            <input type="text"
-                                                   class="form-control text-center bg-transparent border-0 small p-0 fw-bold"
-                                                   value="${item.quantity}" style="max-width: 45px;" readonly>
-                                            <button class="qty-adjust-btn" type="submit" name="action" value="increase">
-                                                +
-                                            </button>
+                                            <button class="qty-adjust-btn" type="submit" name="action" value="decrease" ${item.quantity <= 1 ? 'disabled' : ''}>-</button>
+                                            <input type="text" class="form-control text-center bg-transparent border-0 small p-0 fw-bold" value="${item.quantity}" style="max-width: 45px;" readonly>
+                                            <button class="qty-adjust-btn" type="submit" name="action" value="increase">+</button>
                                         </div>
                                     </form>
 
-                                    <!-- Row Total Cost -->
                                     <div class="text-end" style="min-width: 90px;">
-                                        <h6 class="fw-bold text-dark m-0">$<c:out
-                                                value="${item.price * item.quantity}"/></h6>
+                                        <h6 class="fw-bold text-dark m-0">$<c:out value="${item.subTotal}"/></h6>
                                     </div>
 
-                                    <!-- Delete Item Button Pipeline -->
                                     <form action="cart-remove" method="POST" class="m-0">
                                         <input type="hidden" name="cartItemId" value="${item.id}">
-                                        <button type="submit" class="btn btn-link text-danger p-1 fs-5 line-height-1"
-                                                title="Remove Item">
+                                        <button type="submit" class="btn btn-link text-danger p-1 fs-5 line-height-1" title="Remove Item">
                                             <i class="bi bi-trash3-fill"></i>
                                         </button>
                                     </form>
@@ -158,22 +142,21 @@
                         </c:forEach>
 
                         <div class="d-flex justify-content-between align-items-center pt-2">
-                            <a href="products.jsp"
-                               class="btn btn-link text-decoration-none text-primary fw-semibold p-0 small">
+                            <a href="products.jsp" class="btn btn-link text-decoration-none text-primary fw-semibold p-0 small">
                                 <i class="bi bi-arrow-left"></i> Continue Shopping
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- RIGHT COLUMN: FINANCIAL BREAKDOWN SUMMARIZATION PANEL -->
                 <div class="col-lg-4">
                     <div class="cart-card p-4 shadow-sm bg-white position-sticky" style="top: 24px;">
                         <h5 class="fw-bold mb-4 text-dark">Order Summary</h5>
 
                         <div class="summary-row">
                             <span>Subtotal Items</span>
-                            <span class="text-dark fw-medium">$<c:out value="${cartSubtotal}"/></span>
+                                <%-- Fixed property reference to target the mapped aggregate price --%>
+                            <span class="text-dark fw-medium">$<c:out value="${shoppingCart.totalCartPrice}"/></span>
                         </div>
                         <div class="summary-row">
                             <span>Estimated Shipping</span>
@@ -186,13 +169,10 @@
 
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <span class="fw-bold text-dark">Total Value Due</span>
-                            <h4 class="fw-extrabold text-primary m-0" style="font-weight: 800;">$<c:out
-                                    value="${cartSubtotal}"/></h4>
+                            <h4 class="fw-extrabold text-primary m-0" style="font-weight: 800;">$<c:out value="${shoppingCart.totalCartPrice}"/></h4>
                         </div>
 
-                        <!-- Secure Checkout Action Pipeline -->
-                        <a href="checkout"
-                           class="btn btn-primary w-100 py-2.5 fw-bold rounded-3 shadow-sm border-0 d-flex align-items-center justify-content-center gap-2">
+                        <a href="checkout" class="btn btn-primary w-100 py-2.5 fw-bold rounded-3 shadow-sm border-0 d-flex align-items-center justify-content-center gap-2">
                             <i class="bi bi-shield-lock-fill"></i> Proceed to Checkout
                         </a>
 

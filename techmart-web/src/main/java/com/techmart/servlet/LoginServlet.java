@@ -1,5 +1,6 @@
 package com.techmart.servlet;
 
+import com.techmart.api.service.CartService; // Inject your Cart Service
 import com.techmart.api.service.UserService;
 import com.techmart.core.dto.UserDTO;
 import jakarta.ejb.EJB;
@@ -18,8 +19,11 @@ public class LoginServlet extends HttpServlet {
     @EJB
     private UserService userService;
 
+    @EJB
+    private CartService cartService;
+
     @Override
-    protected void doPost(HttpServletRequest req,HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         String email = req.getParameter("email");
         String password = req.getParameter("password");
@@ -28,11 +32,19 @@ public class LoginServlet extends HttpServlet {
             UserDTO user = userService.login(email, password);
             HttpSession session = req.getSession();
             session.setAttribute("user", user);
-            resp.sendRedirect("index.jsp");
+
+            String guestToken = (String) session.getAttribute("guestToken");
+
+            if (guestToken != null && user != null) {
+                cartService.mergeCart(guestToken, user.getId());
+                session.removeAttribute("guestToken");
+            }
+            resp.sendRedirect("cart");
+
         } catch (RuntimeException e) {
-            req.setAttribute( "error", e.getMessage());
-            req.setAttribute("email",email);
-            req.getRequestDispatcher( "/logIn.jsp").forward(req, resp);
+            req.setAttribute("error", e.getMessage());
+            req.setAttribute("email", email);
+            req.getRequestDispatcher("/logIn.jsp").forward(req, resp);
         }
     }
 }

@@ -257,9 +257,13 @@
                                     <span class="fs-5 fw-bold text-dark" style="font-weight: 800 !important;">
                                         $<%= String.format("%.2f", product.getPrice()) %>
                                     </span>
-                                <button class="btn btn-primary btn-sm rounded-3 px-3 py-2 d-flex align-items-center gap-1" <%= (product.getQty() <= 0) ? "disabled" : "" %>>
-                                    <i class="bi bi-cart-plus"></i> Add
-                                </button>
+                                <form action="cart-add" method="POST" class="m-0">
+                                    <input type="hidden" name="productId" value="<%= product.getId() %>">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="btn btn-primary btn-sm rounded-3 px-3 py-2 d-flex align-items-center gap-1" <%= (product.getQty() <= 0) ? "disabled" : "" %>>
+                                        <i class="bi bi-cart-plus"></i> Add
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
