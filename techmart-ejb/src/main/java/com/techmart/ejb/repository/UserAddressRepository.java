@@ -6,6 +6,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.NoResultException;
 
+import java.util.List;
+
 @Stateless
 public class UserAddressRepository {
 
@@ -30,5 +32,13 @@ public class UserAddressRepository {
 
     public void update(UserAddress address) {
         em.merge(address);
+    }
+
+    public List<UserAddress> findAddressesByUserId(Long userId) {
+        return em.createQuery(
+                        "SELECT a FROM UserAddress a WHERE a.user.id = :userId",
+                        com.techmart.core.entity.UserAddress.class)
+                .setParameter("userId", userId)
+                .getResultList();
     }
 }

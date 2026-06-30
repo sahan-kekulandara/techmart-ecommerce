@@ -9,6 +9,9 @@ import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Stateless
 public class UserAddressServiceBean implements UserAddressService {
 
@@ -43,5 +46,12 @@ public class UserAddressServiceBean implements UserAddressService {
 
             repository.save(newEntity);
         }
+    }
+
+    @Override
+    public List<UserAddressDTO> getUserAddresses(Long userId) {
+        return repository.findAddressesByUserId(userId).stream()
+                .map(mapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

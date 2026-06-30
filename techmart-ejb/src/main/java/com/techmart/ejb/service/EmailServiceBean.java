@@ -1,6 +1,8 @@
 package com.techmart.ejb.service;
 
 import com.techmart.api.service.EmailService;
+import com.techmart.core.util.EnvLoader;
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.ejb.Stateless;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
@@ -16,11 +18,13 @@ public class EmailServiceBean implements EmailService {
 
         try {
 
-            final String username =
-                    "sahanp.kekulandara@gmail.com";
+//            final String username = "sahanp.kekulandara@gmail.com";
 
-            final String password =
-                    "acwq uezb efwg vvfz";
+//            final String password = "acwq uezb efwg vvfz";
+
+
+            String username = EnvLoader.get("MAIL_USERNAME");
+            String password = EnvLoader.get("MAIL_APP_PASSWORD");
 
             Properties props = new Properties();
 
