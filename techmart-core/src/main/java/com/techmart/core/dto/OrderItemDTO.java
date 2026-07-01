@@ -12,7 +12,9 @@ public class OrderItemDTO {
 
     private Long id;
     private Long productId;
+    private String productName;
     private int quantity;
     private double priceAtPurchase;
+    private String imagePath;
     private OrderDTO order;
 }

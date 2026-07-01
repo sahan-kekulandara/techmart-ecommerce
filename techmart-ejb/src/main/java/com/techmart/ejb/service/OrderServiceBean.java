@@ -1,6 +1,7 @@
-package com.techmart.ejb.service.impl;
+package com.techmart.ejb.service;
 
 import com.techmart.api.service.OrderService;
+import com.techmart.core.dto.OrderDTO;
 import com.techmart.core.dto.ShoppingCartDTO;
 import com.techmart.core.dto.UserDTO;
 import com.techmart.core.entity.Order;
@@ -9,12 +10,14 @@ import com.techmart.core.entity.Product;
 import com.techmart.core.entity.User;
 import com.techmart.core.entity.UserAddress;
 import com.techmart.core.enums.OrderStatus;
+import com.techmart.core.mapper.OrderMapper;
 import com.techmart.ejb.repository.*;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Stateless
 public class OrderServiceBean implements OrderService {
@@ -33,7 +36,8 @@ public class OrderServiceBean implements OrderService {
     @Inject
     private ProductRepository productRepository;
 
-
+    @Inject
+    private OrderMapper orderMapper;
 
     @Override
     public String processPaymentSuccess(ShoppingCartDTO cart, UserDTO userDto, String stripeSessionId, Long addressId) {
@@ -81,5 +85,16 @@ public class OrderServiceBean implements OrderService {
         cartRepository.clearCartItems(cart.getId());
 
         return orderId;
+    }
+
+    @Override
+    public List<OrderDTO> getCustomerOrderHistory(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User context identity must be provided.");
+        }
+        List<Order> ordersByUserId = orderRepository.findOrdersByUserId(userId);
+        return orderRepository.findOrdersByUserId(userId).stream()
+                .map(orderMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }
