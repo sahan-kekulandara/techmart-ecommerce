@@ -43,4 +43,10 @@ public class CartRepository {
             em.merge(cart);
         }
     }
+
+    public void clearCartItems(Long cartId) {
+        em.createQuery("DELETE FROM CartItem ci WHERE ci.shoppingCart.id = :cartId")
+                .setParameter("cartId", cartId)
+                .executeUpdate();
+    }
 }

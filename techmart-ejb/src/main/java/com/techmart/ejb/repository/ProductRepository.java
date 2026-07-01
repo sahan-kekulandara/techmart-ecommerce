@@ -139,4 +139,12 @@ public class ProductRepository {
             return null;
         }
     }
+
+    public Product findById(Long id) {
+        try {
+            return em.find(Product.class, id);
+        } catch (NullPointerException e) {
+           return null;
+        }
+    }
 }

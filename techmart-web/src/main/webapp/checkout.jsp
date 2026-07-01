@@ -205,7 +205,20 @@
             return;
         }
 
-        document.getElementById('stripeForm').submit();
+        const form = document.getElementById('stripeForm');
+
+        // Check if the hidden field already exists to prevent duplicate inputs
+        let addressInput = document.getElementById('hiddenAddressId');
+        if (!addressInput) {
+            addressInput = document.createElement('input');
+            addressInput.type = 'hidden';
+            addressInput.id = 'hiddenAddressId';
+            addressInput.name = 'selectedAddressId';
+            form.appendChild(addressInput);
+        }
+
+        addressInput.value = selectedAddress.value;
+        form.submit();
     }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

@@ -22,6 +22,9 @@
         <class>com.techmart.core.entity.UserAddress</class>
         <class>com.techmart.core.entity.CartItem</class>
         <class>com.techmart.core.entity.ShoppingCart</class>
+        <class>com.techmart.core.entity.Order</class>
+        <class>com.techmart.core.entity.OrderItem</class>
+
 
 
         <properties>

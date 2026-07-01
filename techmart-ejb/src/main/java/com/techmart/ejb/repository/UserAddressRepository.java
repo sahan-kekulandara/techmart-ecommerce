@@ -41,4 +41,12 @@ public class UserAddressRepository {
                 .setParameter("userId", userId)
                 .getResultList();
     }
+
+    public UserAddress findByUserAddress(Long id) {
+        try {
+            return em.find(UserAddress.class, id);
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
 }

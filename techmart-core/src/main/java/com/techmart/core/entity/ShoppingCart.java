@@ -34,8 +34,6 @@ public class ShoppingCart implements Serializable {
     @Column(name = "guest_token", length = 255)
     private String guestToken;
 
-    //Standard statuses: ACTIVE, MERGED, CONVERTED, ABANDONED
-    // Standard statuses managed via strict type-safe Enum
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private CartStatus status = CartStatus.ACTIVE;

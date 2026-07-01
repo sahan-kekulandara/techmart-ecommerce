@@ -75,14 +75,23 @@ public class CheckoutViewServlet extends HttpServlet {
         req.setAttribute("deliveryFee", deliveryFee);
         req.setAttribute("finalGrandTotal", finalGrandTotal);
 
-        // Forward to the JSP page so they see the summary!
         req.getRequestDispatcher("/checkout.jsp").forward(req, resp);
     }
 
-    // 🎯 STEP 2: When they click the Pay button on checkout.jsp, this runs!
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
+
+        String addressParam = req.getParameter("selectedAddressId");
+        if (addressParam == null || addressParam.trim().isEmpty()) {
+            System.err.println("[CHECKOUT POST ERROR] Address selection parameter is missing!");
+            resp.sendRedirect("checkout");
+            return;
+        }
+
+        Long addressId = Long.parseLong(addressParam);
+        session.setAttribute("selectedAddressId", addressId);
+        System.out.println("[CHECKOUT POST LOG] Address ID successfully saved in session: " + addressId);
         UserDTO user = (UserDTO) session.getAttribute("user");
 
         if (user == null) {
