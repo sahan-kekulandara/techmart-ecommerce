@@ -1,3 +1,5 @@
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -76,12 +78,13 @@
                             <p class="text-muted small mt-2">We just sent a secure access passport directly to your account.</p>
                         </div>
 
-                        <div class="my-4 p-3 rounded-3 bg-light border border-light">
-                            <p class="text-muted small m-0">We transmitted a secure sign-in token to:</p>
-                            <h6 class="fw-bold text-dark mt-1 mb-0 text-break">
-                                ${not empty param.email ? param.email : 'your-email@company.com'}
-                            </h6>
-                        </div>
+
+                        <c:if test="${not empty registeredEmail}">
+                            <div class="my-4 p-3 rounded-3 bg-light border border-light">
+                                <p class="text-muted small m-0">We transmitted a secure sign-in token to:</p>
+                                <h6 class="fw-bold text-dark mt-1 mb-0 text-break">${registeredEmail}</h6>
+                            </div>
+                        </c:if>
 
                         <p class="text-muted small px-md-3">
                             Click the unique link inside the email to immediately instantiate your dashboard profile. You don't even need to type a password!

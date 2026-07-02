@@ -7,6 +7,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
@@ -18,17 +19,26 @@ public class UserVerifyServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        HttpSession session = req.getSession();
 
         String token = req.getParameter("token");
 
+        if (token == null || token.isBlank()) {
+            session.setAttribute("loginMessage", "Verification token is missing.");
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
         try {
             userService.userVerify(token);
-            resp.sendRedirect("login.jsp");
+
+            session.setAttribute("loginMessage", "Your account has been successfully verified! Please log in.");
+            resp.sendRedirect(req.getContextPath() + "/login");
 
         } catch (RuntimeException e) {
-//            req.setAttribute("error", e.getMessage());
-            resp.getWriter().write(e.getMessage());
-//            req.getRequestDispatcher("/verifyError.jsp").forward(req, resp);
+            session.setAttribute("loginMessage", "Verification failed: " + e.getMessage());
+            resp.sendRedirect(req.getContextPath() + "/login");
         }
     }
 }

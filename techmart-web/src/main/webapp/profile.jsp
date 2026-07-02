@@ -256,14 +256,14 @@
                                                 </div>
                                                 <div class="small text-muted">
                                                     Placed on: <span class="text-dark fw-medium"><c:out
-                                                        value="${order.date}"/></span> • Items: <span
+                                                        value="${order.createdAt}"/></span> • Items: <span
                                                         class="text-dark fw-medium"><c:out
-                                                        value="${order.totalItems}"/></span>
+                                                        value="${fn:length(order.items)}"/></span>
                                                 </div>
                                             </div>
                                             <div class="d-flex align-items-center gap-3">
                                                 <h5 class="fw-extrabold text-dark m-0">$<c:out
-                                                        value="${order.totalPrice}"/></h5>
+                                                        value="${order.totalAmount}"/></h5>
                                                 <a href="order-invoice?id=${order.id}"
                                                    class="btn btn-white bg-white border border-secondary-subtle btn-sm rounded-2 fw-semibold px-3">Details</a>
                                             </div>

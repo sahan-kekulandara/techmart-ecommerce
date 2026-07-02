@@ -46,7 +46,7 @@
 </head>
 <body>
 
-<jsp:include page="components/footer.jsp"/>
+<jsp:include page="components/navbar.jsp"/>
 
 <main class="container my-auto py-5">
     <div class="row justify-content-center">

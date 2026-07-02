@@ -23,7 +23,7 @@ public class ProductViewServlet extends HttpServlet {
         String idParam = req.getParameter("id");
 
         if (idParam == null || idParam.trim().isEmpty()) {
-            resp.sendRedirect("products.jsp");
+            resp.sendRedirect("product.jsp");
             return;
         }
 
@@ -48,7 +48,7 @@ public class ProductViewServlet extends HttpServlet {
             req.getRequestDispatcher("/productView.jsp").forward(req, resp);
 
         } catch (NumberFormatException e) {
-            resp.sendRedirect("products.jsp");
+            resp.sendRedirect("product.jsp");
         }
     }
 }

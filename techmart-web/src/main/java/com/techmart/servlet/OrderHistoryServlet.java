@@ -25,7 +25,6 @@ public class OrderHistoryServlet extends HttpServlet {
         HttpSession session = req.getSession();
         UserDTO user = (UserDTO) session.getAttribute("user");
 
-        // Guard Condition: Unauthorized guests are sent to authentication prompt
         if (user == null) {
             resp.sendRedirect("login.jsp");
             return;

@@ -38,11 +38,15 @@ public class SignupServlet extends HttpServlet {
 
         try {
             userService.register(user);
-            resp.sendRedirect(
-                    "verifyUser.jsp?email="
-                            + URLEncoder.encode(
-                            user.getEmail(),
-                            StandardCharsets.UTF_8));
+//            resp.sendRedirect(
+//                    "verifyUser.jsp?email="
+//                            + URLEncoder.encode(
+//                            user.getEmail(),
+//                            StandardCharsets.UTF_8));
+
+            req.setAttribute("registeredEmail",email);
+            req.getRequestDispatcher("/verifyUser.jsp").forward(req,resp);
+
         } catch (RuntimeException e) {
             req.setAttribute("error", e.getMessage());
             req.setAttribute("firstName", user.getFirstName());
